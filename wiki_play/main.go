@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 
-	"github.com/dustin/go-wikiparse"
+	"github.com/nathj07/go-wikiparse"
 )
 
 func main() {
@@ -19,12 +20,14 @@ func main() {
 		page, err = p.Next()
 		if err == nil {
 			fmt.Println(page.Title)
-			for _, rev := range page.Revisions {
-				fmt.Println("Revision:", rev.ID)
-				fmt.Println("By      :", rev.Contributor)
-				fmt.Println("Body:\n\t", rev.Text)
+			for i, rev := range page.Revisions {
+				body := []byte(rev.Text)
+				err := ioutil.WriteFile(fmt.Sprintf("/tmp/wiki_out/%d.ml", rev.ID), body, 0644)
+				if err != nil {
+					fmt.Printf("Error on page %d: %v\n", rev.ID, err)
+				}
 			}
-			fmt.Println("=========")
+
 		}
 	}
 }
